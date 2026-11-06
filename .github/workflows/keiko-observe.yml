@@ -1,5 +1,8 @@
 name: KEIKO 28-day API observation
 on:
+  push:
+    paths:
+      - '.github/keiko-start'
   schedule:
     - cron: '17 0,6,12,18 * * *'
   workflow_dispatch:
@@ -31,9 +34,9 @@ jobs:
         id: phase
         run: echo "state=$(python3 keiko_finalize.py status)" >> "$GITHUB_OUTPUT"
       - name: Measure
-        if: steps.phase.outputs.state == 'observing' || (steps.phase.outputs.state == 'inactive' && github.event_name == 'workflow_dispatch' && inputs.start_campaign)
+        if: steps.phase.outputs.state == 'observing' || (steps.phase.outputs.state == 'inactive' && ((github.event_name == 'push' && hashFiles('.github/keiko-start') != '') || (github.event_name == 'workflow_dispatch' && inputs.start_campaign)))
         env:
-          START_CAMPAIGN: ${{ github.event_name == 'workflow_dispatch' && inputs.start_campaign }}
+          START_CAMPAIGN: ${{ (github.event_name == 'push' && hashFiles('.github/keiko-start') != '') || (github.event_name == 'workflow_dispatch' && inputs.start_campaign) }}
         run: |
           options=()
           if [[ "$START_CAMPAIGN" == true ]]; then options+=(--start); fi

@@ -25,7 +25,9 @@ python3 report.py --data data/local-pilot --out reports/local-pilot
 1. 自分のGitHubに専用リポジトリを作る。公開設定なら、同梱の観測データや今後の観測結果も公開される。公開リポジトリの標準GitHub-hosted runnerは無料。非公開リポジトリの時間・保存枠は契約による。
 2. ZIP内のこのフォルダの中身をリポジトリのルートへ置く。`.github/workflows/keiko-observe.yml` も含め、デフォルトブランチへコミットしてプッシュする。GitHubの画面でZIPをそのままアップロードするとワークフローとして認識されない。
 3. **Actions → KEIKO 28-day API observation → Run workflow** を開き、デフォルトブランチを選ぶ。**start_campaign** をオンにして実行する。GitHub内蔵の `GITHUB_TOKEN` で結果をコミットするため、リポジトリまたは組織の設定でワークフローへの `contents: write` を許可する。別途APIキーは不要。
-4. 初回実行で **Preserve observations** が成功し、`data/campaign/campaign.json` と `data/campaign/runs/*.jsonl` がコミットされたことを確認する。各実行の **Summary** と **Artifacts → keiko-…** で集計を確認できる。初回の同梱済みパイロットとキャンペーンの結果は別ディレクトリに保存する。
+4. 初回実行で **Preserve observations and final report** が成功し、`data/campaign/campaign.json` と `data/campaign/runs/*.jsonl` がコミットされたことを確認する。各実行の **Summary** と **Artifacts → keiko-…** で集計を確認できる。初回の同梱済みパイロットとキャンペーンの結果は別ディレクトリに保存する。
+
+専用リポジトリでは、初回起動だけを指示する `.github/keiko-start` のコミットでも開始できる。開始済みのキャンペーンでは、このファイルを変更しても開始日時を更新しない。
 
 コミット済みデータを取り出して、任意の時点で再集計できる。
 
