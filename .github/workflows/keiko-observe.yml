@@ -1,0 +1,109 @@
+name: KEIKO 28-day API observation
+on:
+  schedule:
+    - cron: '17 0,6,12,18 * * *'
+  workflow_dispatch:
+    inputs:
+      start_campaign:
+        description: 'Start the 28-day campaign if inactive (one time)'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: keiko-observe
+  cancel-in-progress: false
+jobs:
+  observe:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Determine campaign phase
+        id: phase
+        run: echo "state=$(python3 keiko_finalize.py status)" >> "$GITHUB_OUTPUT"
+      - name: Measure
+        if: steps.phase.outputs.state == 'observing' || (steps.phase.outputs.state == 'inactive' && github.event_name == 'workflow_dispatch' && inputs.start_campaign)
+        env:
+          START_CAMPAIGN: ${{ github.event_name == 'workflow_dispatch' && inputs.start_campaign }}
+        run: |
+          options=()
+          if [[ "$START_CAMPAIGN" == true ]]; then options+=(--start); fi
+          timeout --signal=TERM 10m python3 keiko_probe.py --mode campaign --data data/campaign "${options[@]}"
+      - name: Build final report
+        if: steps.phase.outputs.state == 'finalize'
+        run: python3 keiko_finalize.py finalize
+      - name: Check for new data
+        id: changes
+        if: always() && !cancelled()
+        run: |
+          if [[ -n "$(git status --porcelain -- data/campaign)" ]]; then
+            echo 'observed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Preserve observations and final report
+        id: preserve
+        if: always() && !cancelled() && (steps.changes.outputs.observed == 'true' || steps.phase.outputs.state == 'finalize' || steps.phase.outputs.state == 'airtable-pending')
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          paths=()
+          if [[ -d data/campaign ]]; then paths+=(data/campaign); fi
+          if [[ -f reports/final/completion.json ]]; then paths+=(reports/final); fi
+          if (( ${#paths[@]} )); then git add -- "${paths[@]}"; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "Record KEIKO observation ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}"
+            if ! git push origin "HEAD:refs/heads/$DEFAULT_BRANCH"; then
+              git pull --rebase origin "$DEFAULT_BRANCH"
+              git push origin "HEAD:refs/heads/$DEFAULT_BRANCH"
+            fi
+          fi
+          echo "report_commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Record final summary in Airtable
+        if: success() && (steps.phase.outputs.state == 'finalize' || steps.phase.outputs.state == 'airtable-pending')
+        env:
+          AIRTABLE_PAT: ${{ secrets.AIRTABLE_PAT }}
+          KEIKO_REPORT_COMMIT: ${{ steps.preserve.outputs.report_commit }}
+        run: |
+          set -euo pipefail
+          python3 keiko_finalize.py airtable
+          if [[ -f reports/final/airtable_receipt.json ]]; then
+            git add -- reports/final/airtable_receipt.json
+            if ! git diff --cached --quiet; then
+              git commit -m "Record KEIKO Airtable publication"
+              if ! git push origin "HEAD:refs/heads/$DEFAULT_BRANCH"; then
+                git pull --rebase origin "$DEFAULT_BRANCH"
+                git push origin "HEAD:refs/heads/$DEFAULT_BRANCH"
+              fi
+            fi
+          fi
+      - name: Build observation summary
+        if: always() && !cancelled() && steps.changes.outputs.observed == 'true'
+        run: |
+          python3 report.py --data data/campaign --out reports/campaign
+          cat reports/campaign/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Show final summary
+        if: always() && !cancelled() && steps.phase.outputs.state == 'finalize'
+        run: |
+          if [[ -f reports/final/REPORT.md ]]; then
+            cat reports/final/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Retain a recovery copy
+        if: always() && !cancelled() && (steps.changes.outputs.observed == 'true' || steps.phase.outputs.state == 'finalize')
+        uses: actions/upload-artifact@v6
+        with:
+          name: keiko-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            reports/campaign/
+            reports/final/
+            data/campaign/
+          retention-days: 35
+          if-no-files-found: warn

@@ -1,0 +1,15 @@
+Records: 124 Unique project IDs: 116 Seen across >=2 routes: 8
+search-trending          found= 20 new_in_order= 20 unique_to_this_probe_route= 20 stats_present= 20
+search-game              found= 20 new_in_order= 20 unique_to_this_probe_route= 20 stats_present= 20
+search-ゲーム               found= 20 new_in_order= 20 unique_to_this_probe_route= 20 stats_present= 20
+author-riki-kusa         found= 20 new_in_order= 20 unique_to_this_probe_route= 12 stats_present= 20
+favorites-riki-kusa      found= 20 new_in_order= 16 unique_to_this_probe_route= 16 stats_present= 20
+studio-re-ratch-news     found=  4 new_in_order=  0 unique_to_this_probe_route=  0 stats_present=  0
+author-griffpatch        found= 20 new_in_order= 20 unique_to_this_probe_route= 20 stats_present= 20
+
+Selected list/detail comparisons (not simultaneous):
+1399147684 title_equal= False views_delta= 7895 loves_delta= 1054 favorites_delta= 915
+1391747189 title_equal= True views_delta= 0 loves_delta= 0 favorites_delta= 0
+1399302174 title_equal= True views_delta= 0 loves_delta= 0 favorites_delta= 0
+
+Checks passed. Reminder: this does NOT estimate Scratch-wide coverage or freshness.

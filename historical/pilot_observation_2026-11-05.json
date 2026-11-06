@@ -1,0 +1,35 @@
+{
+  "description": "SMALL REAL OBSERVATION: Scratch API JSON retrieved through Firecrawl on 2026-11-05 UTC. This is not direct HTTP measurement and does not include origin response headers.",
+  "retrieved_at_utc": "2026-11-05T07:59:16Z",
+  "access_method": "Firecrawl proxy; exact Scratch API URLs; maxAge=0; 7 list requests and 4 detail requests",
+  "not_a_claim_of": ["complete Scratch project coverage", "HTTP header cache age", "origin request speed", "representative sample"],
+  "lists": {
+    "search-trending": [1392620147,1392356111,1393342706,1386219222,1391552209,1392115446,1392605661,1388066593,1363473314,1369260039,1388084598,1385807979,1385157176,1385134134,1386135510,1385139893,1384207536,1384432310,1385249136,1380896061],
+    "search-game": [1396640964,1399071204,1391404503,1399163518,1399112952,1399083024,1375192548,1398756434,1393222440,1399097506,1393932850,1399125357,1399114642,1399121016,1393932157,1399058637,1399060619,1397750368,1399091276,1385897951],
+    "search-ゲーム": [1399178603,1398662927,1397938269,1388866182,1396566893,1397605796,1398325940,1397444459,1397858941,1390639942,1395760578,1397167655,1398353858,1398283552,1398094824,1396615159,1395436272,1394813683,1397917292,1399075710],
+    "author-riki-kusa": [1399302174,1399301417,1391747189,1392250932,1390883910,1386086366,1386204401,1382956580,1378754524,1378321094,1362294500,1334670461,1333975819,1331479346,1328474938,1327487362,1327485797,1324971825,1313493577,1291475541],
+    "favorites-riki-kusa": [1393298132,1391505214,1389094098,1389025889,1387440010,557301743,1351425040,1380964938,1378754524,1334670461,1333032300,1326363438,1328474938,1327910249,1320925432,1323837498,1317882925,1313493577,1304220305,1240850969],
+    "studio-re-ratch-news": [1399302174,1399301417,1378321094,1390883910],
+    "author-griffpatch": [1399147684,1367046445,843162693,1326350994,1290458909,1230616495,612229554,1107467742,948573479,788908450,113321949,782532204,776734831,730621225,725184661,60917032,704676520,678512904,572484485,522557780]
+  },
+  "list_stats_present_count": {
+    "search-trending": 20,
+    "search-game": 20,
+    "search-ゲーム": 20,
+    "author-riki-kusa": 20,
+    "favorites-riki-kusa": 20,
+    "studio-re-ratch-news": 0,
+    "author-griffpatch": 20
+  },
+  "selected_list_samples": {
+    "1399147684": {"source":"author-griffpatch","title":"Big Wheel Buggy Test","views":2279,"loves":578,"favorites":494},
+    "1391747189": {"source":"author-riki-kusa","title":"G.A.R.F(仮称)憲章","views":5,"loves":1,"favorites":1},
+    "1399302174": {"source":"author-riki-kusa","title":"テスト用Re:Ratch News投稿2","views":3,"loves":0,"favorites":0}
+  },
+  "individual_api_results": {
+    "1399147684": {"title":"Off-Road Playground v0.2","views":10174,"loves":1632,"favorites":1409,"public":true,"visibility":"visible"},
+    "1391747189": {"title":"G.A.R.F(仮称)憲章","views":5,"loves":1,"favorites":1,"public":true,"visibility":"visible"},
+    "1399302174": {"title":"テスト用Re:Ratch News投稿2","views":3,"loves":0,"favorites":0,"public":true,"visibility":"visible"},
+    "1392250932": {"title":"全盛期補填連邦（仮称）設立構想について","views":71,"loves":4,"favorites":4,"public":true,"visibility":"visible"}
+  }
+}

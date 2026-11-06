@@ -1,0 +1,6 @@
+﻿route,project_id,first_utc,last_utc,observed_span_hours,max_gap_hours,paired_mismatches,distinct_http_dates,distinct_body_hashes,low_age_pairs,same_list_fields,origin_staleness_candidate,state
+anchor-title:0,1399147684,2026-11-06T00:56:00.773+00:00,2026-11-06T00:56:00.773+00:00,0.0,,1,1,1,1,True,False,unresolved-at-last-pair
+author:griffpatch,1399147684,2026-11-06T00:56:53.440+00:00,2026-11-06T00:56:53.440+00:00,0.0,,1,1,1,1,True,False,unresolved-at-last-pair
+check-title:385140042,385140042,2026-11-06T00:58:04.411+00:00,2026-11-06T00:58:04.411+00:00,0.0,,1,1,1,1,True,False,unresolved-at-last-pair
+check-title:848752707,848752707,2026-11-06T00:58:04.498+00:00,2026-11-06T00:58:04.498+00:00,0.0,,1,1,1,1,True,False,unresolved-at-last-pair
+search:2,1399150481,2026-11-06T00:56:11.444+00:00,2026-11-06T00:56:11.444+00:00,0.0,,1,1,1,1,True,False,unresolved-at-last-pair
