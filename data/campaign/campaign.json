@@ -1,0 +1,85 @@
+{
+  "started_utc": "2026-11-06T01:49:29.369+00:00",
+  "days": 28,
+  "config": {
+    "days": 28,
+    "interval_seconds": 2,
+    "parallelism": 2,
+    "max_requests": 64,
+    "timeout_seconds": 18,
+    "retries": 1,
+    "max_backoff_seconds": 30,
+    "list_limit": 20,
+    "panel_seed": 20261106,
+    "panel_per_group": 2,
+    "exact_title_checks": 4,
+    "burst_views_per_6h": 100,
+    "burst_loves_per_6h": 10,
+    "burst_favorites_per_6h": 5,
+    "anchor_id": 1399147684,
+    "anchor_queries": [
+      "Big Wheel Buggy Test",
+      "Off-Road Playground v0.2"
+    ],
+    "users": [
+      {
+        "name": "riki-kusa",
+        "group": "日本語圏・運営／ゲーム"
+      },
+      {
+        "name": "MaterArc",
+        "group": "台帳由来の別作者"
+      },
+      {
+        "name": "griffpatch",
+        "group": "英語圏・著名ゲーム作者"
+      },
+      {
+        "name": "mres",
+        "group": "長期の共有履歴"
+      },
+      {
+        "name": "MyRedNeptune",
+        "group": "旧作を含む別作者"
+      }
+    ],
+    "studios": [
+      52054890,
+      51416738,
+      26134440
+    ],
+    "searches": [
+      {
+        "language": "ja",
+        "q": "ゲーム",
+        "mode": "recent"
+      },
+      {
+        "language": "ja",
+        "q": "アニメ",
+        "mode": "recent"
+      },
+      {
+        "language": "en",
+        "q": "platformer",
+        "mode": "recent"
+      },
+      {
+        "language": "en",
+        "q": "animation",
+        "mode": "recent"
+      },
+      {
+        "language": "es",
+        "q": "juego",
+        "mode": "recent"
+      },
+      {
+        "language": "ja",
+        "q": "ゲーム",
+        "mode": "recent",
+        "offset": 20
+      }
+    ]
+  }
+}
