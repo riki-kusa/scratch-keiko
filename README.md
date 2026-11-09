@@ -36,7 +36,7 @@ git pull
 python3 report.py --data data/campaign --out reports/campaign
 ```
 
-予定は毎日 **03:17、09:17、15:17、21:17 JST**。初回の手動起動から28日を計り、開始基準の6時間枠につき終了記録が1つあれば再実行時に取得を省略する。最初の観測は手動実行時刻なので、次の予定実行と近い場合は同枠として省略する。GitHubの遅延・欠落により112枠すべてが埋まるとは限らない。28日経過後はScratch APIの取得を停止し、次に実行されたジョブで最終レポートをGitへ保存する。観測枠が欠けた場合も集計し、欠けた枠を表示する。途中停止・再開はActions画面から行い、停止中の期間も観測期間に含まれる。
+起動候補は毎日 **01:17、03:17、05:17、…、23:17 JST**（2時間ごと）。キャンペーン開始から28日間を6時間枠に分ける。今回の開始時刻に対して、各枠の開始から約28分・2時間28分・4時間28分後に起動候補がある。すでに終了記録がある枠ではScratch APIの取得を省略する。起動時刻はGitHubの遅延・欠落に左右されるため、全112枠の観測を保証するものではない。28日経過後はScratch APIの取得を停止し、次に実行されたジョブで最終レポートをGitへ保存する。欠測枠は実際のログを基に集計する。途中停止・再開はActions画面から行い、停止中の期間も観測期間に含まれる。
 
 参考 [GitHub Actionsの定期実行](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)、[トークン権限](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication)、[料金と使用量](https://docs.github.com/en/actions/concepts/billing-and-usage)。
 

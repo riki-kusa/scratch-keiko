@@ -4,7 +4,7 @@ on:
     paths:
       - '.github/keiko-start'
   schedule:
-    - cron: '17 0,6,12,18 * * *'
+    - cron: '17 */2 * * *'
   workflow_dispatch:
     inputs:
       start_campaign:
