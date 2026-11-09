@@ -45,9 +45,9 @@ python3 report.py --data data/campaign --out reports/campaign
 - 観測記録はデフォルトブランチの `data/campaign/runs/` に順次コミットされる。
 - 28日の期限後に最初に動いたジョブが `reports/final/REPORT.md`、`summary.json`、各CSV、欠測枠を含む `completion.json` を生成し、デフォルトブランチにコミットする。GitHubの実行遅延によって、最終集計時刻は観測期限より後になる。
 - レポートのpush成功後、Airtableの既存「検証計画」テーブルにキャンペーン開始時刻をキーに最終集計を追加・更新する。再試行で同じ観測の記録を重複作成しない。成功時は `reports/final/airtable_receipt.json` にレコードURLが残る。
-- Airtableのトークンが未設定でもGitHubへの最終レポート保存は行われる。最終化後のジョブは、Airtable未登録の場合だけ登録を試行する。登録まで済むと以後のジョブは状態確認だけで終わる。
+- `AIRTABLE_PAT` が未設定なら、最終レポートがGitHubに保存された時点でキャンペーンは完了する。設定済みならAirtableへの記録も完了条件に含まれる。完了後はワークフロー自体を無効化し、定期起動を止める。停止のGitHub API呼び出しが失敗した場合は、次の起動時に再試行する。
 
-Airtableの自動記録を有効にするには、台帳を書き込めるアカウントで [Airtable Personal Access Token](https://airtable.com/create/tokens) を発行する。Scope は `data.records:write`、アクセス先は「Scratch KEIKO｜技術調査・設計台帳」。GitHubの **Settings → Secrets and variables → Actions → New repository secret** に `AIRTABLE_PAT` として保存する。トークンをコードやチャットに貼る必要はない。期限後に追加した場合は、次の定期実行または `start_campaign` オフの手動実行で登録できる。
+Airtableの自動記録を有効にするには、台帳を書き込めるアカウントで [Airtable Personal Access Token](https://airtable.com/create/tokens) を発行する。Scope は `data.records:write`、アクセス先は「Scratch KEIKO｜技術調査・設計台帳」。GitHubの **Settings → Secrets and variables → Actions → New repository secret** に `AIRTABLE_PAT` として保存する。トークンをコードやチャットに貼る必要はない。自動記録を使う場合は観測期限までに設定する。完了後に追加で記録する場合は、トークンを設定し、Actions画面でワークフローを再度有効にして `start_campaign` オフのまま手動実行する。記録成功後、ワークフローは再び無効になる。
 
 ## 測定条件
 

@@ -23,7 +23,7 @@ NAME, PURPOSE, METHOD, FINDINGS = (
 )
 
 
-def status(data=DATA, final=FINAL):
+def status(data=DATA, final=FINAL, *, airtable_enabled=False):
     state_path = data / 'campaign.json'
     if not state_path.exists():
         return 'inactive'
@@ -31,9 +31,11 @@ def status(data=DATA, final=FINAL):
     end = dt.datetime.fromisoformat(state['started_utc']) + dt.timedelta(days=state['days'])
     if utc_now() < end:
         return 'observing'
-    if not (final / 'completion.json').exists():
+    if not all((final / name).is_file() for name in ('REPORT.md', 'completion.json')):
         return 'finalize'
-    return 'done' if (final / 'airtable_receipt.json').exists() else 'airtable-pending'
+    if airtable_enabled and not (final / 'airtable_receipt.json').is_file():
+        return 'airtable-pending'
+    return 'done'
 
 
 def finalize(data=DATA, final=FINAL):
@@ -94,7 +96,7 @@ def publish_airtable(final=FINAL):
         return
     token = os.getenv('AIRTABLE_PAT', '').strip()
     if not token:
-        print('::notice::AIRTABLE_PAT is not configured. The final report is saved; Airtable publication remains pending.')
+        print('::notice::AIRTABLE_PAT is not configured. The final report is saved; Airtable publication is skipped.')
         return
     summary = load_json(final / 'summary.json')
     completion = load_json(final / 'completion.json')
@@ -129,7 +131,7 @@ if __name__ == '__main__':
     parser.add_argument('command', choices=['status', 'finalize', 'airtable'])
     command = parser.parse_args().command
     if command == 'status':
-        print(status())
+        print(status(airtable_enabled=os.getenv('KEIKO_AIRTABLE_ENABLED') == 'true'))
     elif command == 'finalize':
         finalize()
     else:

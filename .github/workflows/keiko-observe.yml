@@ -21,8 +21,11 @@ jobs:
     if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     timeout-minutes: 18
+    outputs:
+      disable_schedule: ${{ steps.completion.outputs.disable_schedule }}
     env:
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      KEIKO_AIRTABLE_ENABLED: ${{ secrets.AIRTABLE_PAT != '' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -71,7 +74,7 @@ jobs:
           fi
           echo "report_commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Record final summary in Airtable
-        if: success() && (steps.phase.outputs.state == 'finalize' || steps.phase.outputs.state == 'airtable-pending')
+        if: success() && env.KEIKO_AIRTABLE_ENABLED == 'true' && (steps.phase.outputs.state == 'finalize' || steps.phase.outputs.state == 'airtable-pending')
         env:
           AIRTABLE_PAT: ${{ secrets.AIRTABLE_PAT }}
           KEIKO_REPORT_COMMIT: ${{ steps.preserve.outputs.report_commit }}
@@ -88,6 +91,15 @@ jobs:
               fi
             fi
           fi
+      - name: Confirm campaign completion
+        id: completion
+        if: success() && (steps.phase.outputs.state == 'finalize' || steps.phase.outputs.state == 'airtable-pending' || steps.phase.outputs.state == 'done')
+        run: |
+          set -euo pipefail
+          test "$(python3 keiko_finalize.py status)" = done
+          git cat-file -e HEAD:reports/final/REPORT.md
+          git cat-file -e HEAD:reports/final/completion.json
+          echo 'disable_schedule=true' >> "$GITHUB_OUTPUT"
       - name: Build observation summary
         if: always() && !cancelled() && steps.changes.outputs.observed == 'true'
         run: |
@@ -110,3 +122,18 @@ jobs:
             data/campaign/
           retention-days: 35
           if-no-files-found: warn
+  stop-schedule:
+    needs: observe
+    if: ${{ !cancelled() && needs.observe.outputs.disable_schedule == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      actions: write
+    steps:
+      - name: Disable the completed observation workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/actions/workflows/keiko-observe.yml/disable"
+          echo 'KEIKO observation workflow disabled.'
