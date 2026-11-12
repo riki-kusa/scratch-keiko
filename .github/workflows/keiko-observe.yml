@@ -11,6 +11,10 @@ on:
         description: 'Start the 28-day campaign if inactive (one time)'
         type: boolean
         default: false
+      continue_observation:
+        description: 'Keep a runner available for the next observation window'
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -20,7 +24,10 @@ jobs:
   observe:
     if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 270
+    permissions:
+      contents: write
+      actions: write
     outputs:
       disable_schedule: ${{ steps.completion.outputs.disable_schedule }}
     env:
@@ -33,6 +40,9 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Wait for the next observation opportunity
+        if: github.event_name == 'workflow_dispatch' && inputs.continue_observation
+        run: python3 keiko_wait.py
       - name: Determine campaign phase
         id: phase
         run: echo "state=$(python3 keiko_finalize.py status)" >> "$GITHUB_OUTPUT"
@@ -122,6 +132,24 @@ jobs:
             data/campaign/
           retention-days: 35
           if-no-files-found: warn
+      - name: Start the next observation runner
+        if: always() && !cancelled() && steps.phase.outputs.state == 'observing'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/keiko-observe.yml/dispatches" --input - <<EOF
+          {"ref":"$DEFAULT_BRANCH","inputs":{"start_campaign":false,"continue_observation":true}}
+          EOF
+            then
+              echo 'Next observation runner requested.'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Could not request the next runner; the scheduled trigger remains as a recovery path.' >&2
+          exit 1
   stop-schedule:
     needs: observe
     if: ${{ !cancelled() && needs.observe.outputs.disable_schedule == 'true' }}

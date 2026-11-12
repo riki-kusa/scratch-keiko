@@ -36,7 +36,7 @@ git pull
 python3 report.py --data data/campaign --out reports/campaign
 ```
 
-起動候補は毎日 **01:17、03:17、05:17、…、23:17 JST**（2時間ごと）。キャンペーン開始から28日間を6時間枠に分ける。今回の開始時刻に対して、各枠の開始から約28分・2時間28分・4時間28分後に起動候補がある。すでに終了記録がある枠ではScratch APIの取得を省略する。起動時刻はGitHubの遅延・欠落に左右されるため、全112枠の観測を保証するものではない。28日経過後はScratch APIの取得を停止し、次に実行されたジョブで最終レポートをGitへ保存する。欠測枠は実際のログを基に集計する。途中停止・再開はActions画面から行い、停止中の期間も観測期間に含まれる。
+定期起動候補は毎日 **01:17、03:17、05:17、…、23:17 JST**（2時間ごと）。これに加え、観測ジョブの終了時に次のジョブを `workflow_dispatch` で直接起動する。継続ジョブは同じ6時間枠の観測が済んでいれば、次の枠まで待機する。1ジョブの待機は最大4時間、全体の上限は4時間30分。未完了枠は60秒後、記録されたHTTPの待機指定があればその時刻以降に再確認する。定期起動はこの連鎖が止まった場合の復旧にも使う。観測済み枠でのScratch API取得は省略する。
 
 参考 [GitHub Actionsの定期実行](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)、[トークン権限](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication)、[料金と使用量](https://docs.github.com/en/actions/concepts/billing-and-usage)。
 
@@ -97,3 +97,5 @@ API別の独自IDは測定した他の発見経路に現れなかったID。タ�
 | 定期実行の結果がない | デフォルトブランチ、Actions有効状態、`campaign.json`、実行時刻、同枠完了・期限・冷却期間のメッセージを確認する。すでに開始済みなら `start_campaign` をオフのまま手動実行できる |
 
 GitHub Pagesの設定は不要。Actionsの集計とコミット済みデータで確認できる。
+
+継続ジョブは待機中もGitHub-hosted runnerを占有し、連続稼働すると約24ランナー時間/日になる。公開リポジトリの標準runnerを使用する構成だが、実行上限やGitHubの停止・起動遅延を受けるため、欠測ゼロは保証しない。GitHubの実行履歴で継続起動の成功と待機先の時刻を確認できる。28日の期限後は既存の最終集計・保存・自動無効化に進み、過去の欠測枠を後から取得した値で埋めない。
